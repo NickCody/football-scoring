@@ -3,7 +3,8 @@ Program that determines individual football scores
 based on a target score. So 10 might yield (3, 7)
 """
 
-SCORING = (7, 3, 2)
+# The kinds of scores we support: touchdown, field goal, safety
+VALID_POINTS = (7, 3, 2)
 
 def combine(total_score):
     """ function that returns a tuple of points that add up to target score"""
@@ -11,13 +12,8 @@ def combine(total_score):
     if total_score <= 0:
         return ()
 
-    if total_score >= 9:
-        optimized_scoring = (7,)
-    else:
-        optimized_scoring = SCORING
-
-    possibles = map(lambda points: combine(total_score - points) + (points,), optimized_scoring)
-    solutions = filter(lambda series: sum(series) == total_score, possibles)
+    possibles = [combine(total_score - points) + (points,) for points in VALID_POINTS]
+    solutions = [s for s in possibles if sum(s) == total_score]
 
     if solutions:
         return solutions[0]

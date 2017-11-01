@@ -1,47 +1,61 @@
+"""
+Program that determines individual football scores
+based on a target score. So 10 might yield (3, 7)
+
+Uses more realistic scoring, touchdown is 6, and you can get an extra
+point or 2-point conversti on
+"""
+
 import itertools
 flatten = itertools.chain.from_iterable
 
-scoring = (7, 3, 2, 6, 1)
+SCORING = (7, 3, 2, 6, 1)
 
 def dist(list_of_tup, i):
-  return tuple(map(lambda one_tup: one_tup + (i,), list_of_tup))
+    """ Appends i to each tuple in tupes"""
 
-def t2a(t):
-  return map(lambda v: v, t)
+    return tuple(map(lambda one_tup: one_tup + (i,), list_of_tup))
 
-def valid(t):
-  if len(t) == 0:
-    return True
-  elif t[0] == 1:
-    return False
-  elif t[0:3] == (6,1):
-    return valid(t[2:])
-  else:
-    return valid(t[1:])
+def t2a(tup):
+    """ tuple to array """
+    return map(lambda v: v, tup)
+
+def valid(tup):
+    """ Determines if scores are valid, mostly validating a 1 can only be preceded by a 6 """
+    if not tup:
+        return True
+    elif tup[0] == 1:
+        return False
+    elif tup[0:3] == (6, 1):
+        return valid(tup[2:])
+    else:
+        return valid(tup[1:])
 
 def combine(total_score):
-  if total_score <= 1:
-    return ((),)
+    """ function that returns a tuple of points that add up to target score"""
 
-  possibles = tuple(flatten(map(lambda p: dist(combine(total_score - p), p), scoring)))
-  solutions = filter(lambda scores: sum(t2a(scores)) == total_score and valid(scores), possibles)
+    if total_score <= 1:
+        return ((),)
 
-  return solutions
+    possibles = flatten([dist(combine(total_score - p), p) for p in SCORING])
+    solutions = [s for s in possibles if sum(t2a(s)) == total_score and valid(s)]
+
+    return solutions
 
 def unique(solutions):
+    """Returns only unique combinations by sorting tuple and using set()"""
+    sorted_solutions = map(lambda series: tuple(sorted(series)), solutions)
+    unique_solutions = set(sorted_solutions)
+    return unique_solutions
 
-  sorted_solutions = map(lambda series: tuple(sorted(series)), solutions)
-  unique_solutions = set(sorted_solutions)
-  return unique_solutions
+if __name__ == "__main__":
 
-score = input ("Enter an integer greater than 1 : ")
+    SCORE = input("Enter an integer greater than 1 : ")
 
-print("All Solutions:")
-for series in combine(score):
-  print series
+    print "All Solutions:"
+    for series in combine(SCORE):
+        print series
 
-print("Unique Solutions:")
-for series in unique(combine(score)):
-  print series
-
-
+    print "Unique Solutions:"
+    for series in unique(combine(SCORE)):
+        print series
