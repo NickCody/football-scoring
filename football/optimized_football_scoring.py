@@ -8,8 +8,14 @@ SCORING = (7, 3, 2)
 def combine(total_score):
     """ function that returns a tuple of points that add up to target score"""
 
-    if total_score <= 0:
-        return ()
+    # This small optimization skips a lot of subtrees that don't wind up
+    # getting selected anyway since we return only the first solution[0].
+    # below... as a result we can easily handle very large scores since
+    # Any score above 9 just selects 7 (lame)
+    if total_score >= 9:
+        optimized_scoring = (7,)
+    else:
+        optimized_scoring = scoring
 
     if total_score >= 9:
         optimized_scoring = (7,)
